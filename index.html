@@ -289,15 +289,15 @@
             <h2>Input Details</h2>
             <div class="input-group">
                 <label for="fundingDescription">Name:</label>
-                <input type="text" id="fundingDescription" value="PhD Studentship (UKRI)">
+                <input type="text" id="fundingDescription" value="">
             </div>
             <div class="input-group">
                 <label for="startDate">Student Start Date:</label>
-                <input type="date" id="startDate" value="2025-10-01">
+                <input type="date" id="startDate" value="">
             </div>
             <div class="input-group">
                 <label for="fundingEndDate">Funding End Date:</label>
-                <input type="date" id="fundingEndDate" value="2028-09-30">
+                <input type="date" id="fundingEndDate" value="">
             </div>
 
             <hr>
@@ -305,16 +305,16 @@
             <h2>Past Payment History</h2>
             <div class="input-group">
                 <label>Past Payments Mode:</label>
-                <input type="radio" name="paymentMode" id="modeAuto" value="auto" checked> <label for="modeAuto" style="width: auto; font-weight: normal;">Automatic (Count)</label>
-                <input type="radio" name="paymentMode" id="modeManual" value="manual"> <label for="modeManual" style="width: auto; font-weight: normal;">Manual Entry</label>
+                <input type="radio" name="paymentMode" id="modeAuto" value="auto"> <label for="modeAuto" style="width: auto; font-weight: normal;">Automatic (Count)</label>
+                <input type="radio" name="paymentMode" id="modeManual" value="manual" checked> <label for="modeManual" style="width: auto; font-weight: normal;">Manual Entry</label>
             </div>
             
-            <div id="autoControls" class="input-group" style="display: block;">
+            <div id="autoControls" class="input-group" style="display: none;">
                 <label for="paymentsAlreadyMade">Payments Count (Regular 3-mo periods):</label>
                 <input type="number" id="paymentsAlreadyMade" value="0" min="0" style="width: 50px;">
             </div>
             
-            <details id="manualPaymentDetails" style="display: none;">
+            <details id="manualPaymentDetails" style="display: block;">
                 <summary>Manual Payment Periods Already Made (Start & End Dates)</summary>
                 <div id="manualPaymentsList">
                     </div>
@@ -329,15 +329,15 @@
      
                 <div class="leave-entry">
                     <select class="type-select">
-                        <option value="unfunded">Unfunded</option>
+                        <option value="unfunded" selected>Unfunded</option>
                         <option value="funded-uncapped">Funded (Uncapped)</option>
                         <option value="funded-capped">Funded (Capped)</option>
                         <option value="medical">Medical</option>
-                        <option value="maternity" selected>Maternity</option>
+                        <option value="maternity">Maternity</option>
                     </select>
-                    Start: <input type="date" class="leave-start" value="2026-01-01">
-                    End: <input type="date" class="leave-end" value="2026-10-01">
-                    Description: <input type="text" class="leave-description" placeholder="e.g., Parental Leave" value="Maternity Leave (26 Weeks Full, 13 Weeks SMP)">
+                    Start: <input type="date" class="leave-start" value="">
+                    End: <input type="date" class="leave-end" value="">
+                    Description: <input type="text" class="leave-description" placeholder="e.g., Parental Leave" value="">
                     <button class="remove-btn" onclick="this.parentNode.remove()">Remove</button>
                 </div>
                 
@@ -1598,27 +1598,21 @@
             
             radioButtons.forEach(radio => radio.addEventListener('change', togglePaymentMode));
 
-            // --- USER SCENARIO SETUP (Maternity Split Test) ---
-            document.getElementById('modeAuto').checked = true; 
+            // --- USER SCENARIO SETUP (Reset to empty/manual) ---
+            document.getElementById('modeAuto').checked = false; // Ensure auto is unchecked
+            document.getElementById('modeManual').checked = true; // Ensure manual is checked
             document.getElementById('paymentsAlreadyMade').value = '0';
             togglePaymentMode();
             
-            // Re-adjusting the default LOA to better illustrate the mix described by the user
-            // LOA: 2026-01-01 to 2026-10-01 (274 days)
-            // Full Mat (182 days) ends 2026-07-01.
-            // SMP (91 days) ends 2026-10-01.
-            // Payment P4 period: 2026-07-01 to 2026-09-30 (1 day Full Mat, 91 days SMP)
+            // Remove the default LOA entry to ensure a completely clean start for the user
             const defaultLeaveEntry = document.querySelector('#leavePeriods .leave-entry');
             if(defaultLeaveEntry) {
-                 defaultLeaveEntry.querySelector('.type-select').value = 'maternity';
-                 defaultLeaveEntry.querySelector('.leave-start').value = '2026-01-01';
-                 defaultLeaveEntry.querySelector('.leave-end').value = '2026-10-01'; // 274 days total
-                 defaultLeaveEntry.querySelector('.leave-description').value = 'Maternity Leave (26 Weeks Full, 13 Weeks SMP)';
+                 defaultLeaveEntry.remove();
             }
 
 
-            // Run on load with default dates
-            generateTimeline();
+            // Do NOT call generateTimeline() on load so the user sees the initial "Press 'Generate Timeline'..." message.
+            // generateTimeline(); 
         });
     </script>
 
